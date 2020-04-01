@@ -117,7 +117,8 @@ const sendEmail = async (
     transporter.sendMail(mailOptions, (error, info) => {
       const messageId = info && info.messageId
       if (error || !messageId) {
-        reject(error || new Error('Unable to send mail'))
+        console.error(error)
+        reject(new Error('Unable to send mail'))
       } else {
         resolve(`Message sent: ${info.messageId}`)
       }
