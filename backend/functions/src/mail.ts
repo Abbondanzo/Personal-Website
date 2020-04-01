@@ -71,7 +71,7 @@ const buildTemplate = (
  *
  * @returns {Promise} if resolves correctly, returns email message ID. If rejects, returns error
  */
-const sendEmail = (
+const sendEmail = async (
   name: string,
   email: string,
   message: string,
@@ -100,39 +100,28 @@ const sendEmail = (
     userAgent: request.get('User-Agent')
   }
 
-  // First, build the template
+  try {
+    const template = await buildTemplate(data, response)
+    console.log('Successfully generated HTML template')
+    mailOptions['html'] = template
+  } catch (msg) {
+    console.log('Failed to generate HTML template. Defaulting to text')
+    mailOptions['text'] = msg
+  }
+
+  console.log('Sending email...')
+
+  // Send mail
+  const transporter = buildTransporter()
   return new Promise((resolve, reject) => {
-    buildTemplate(data, response)
-      .then((template: String) => {
-        console.log('Successfully generated HTML template')
-        mailOptions['html'] = template
-      })
-      .catch((msg: string) => {
-        console.log('Failed to generate HTML template. Defaulting to text')
-        mailOptions['text'] = msg
-      })
-      .then(() => {
-        console.log('Sending email...')
-        // Nodemailer transporter with required credentials
-        let transporter: nodemailer.Transporter
-        try {
-          transporter = buildTransporter()
-        } catch (error) {
-          reject(`Unable to create transporter: ${error}`)
-          return
-        }
-        // Send mail with defined transport object
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error || !info || !info.messageId) {
-            console.error(error)
-            reject(`${error || info || info.messageId}`)
-          }
-          resolve(`Message sent: ${info.messageId}`)
-        })
-      })
-      .catch((error: any) => {
-        reject(`Error with template: ${error}`)
-      })
+    transporter.sendMail(mailOptions, (error, info) => {
+      const messageId = info && info.messageId
+      if (error || !messageId) {
+        reject(error || new Error('Unable to send mail'))
+      } else {
+        resolve(`Message sent: ${info.messageId}`)
+      }
+    })
   })
 }
 
