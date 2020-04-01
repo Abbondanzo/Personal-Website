@@ -118,14 +118,14 @@ const sendEmail = async (
       transporter.sendMail(mailOptions, (error, info) => {
         const messageId = info && info.messageId
         if (error || !messageId) {
-          console.error(error)
+          console.error(error && error.message)
           reject(new Error('Unable to send mail'))
         } else {
           resolve(`Message sent: ${info.messageId}`)
         }
       })
     } catch (err) {
-      console.error(err)
+      console.error(err && err.message)
       reject(new Error('Unable to send mail'))
     }
   })
@@ -176,8 +176,8 @@ app.post(
         console.log(result)
         return response.status(200).send('Message sent successfully!')
       })
-      .catch((error: any) => {
-        return response.status(403).send(error)
+      .catch((error: Error) => {
+        return response.status(403).send(error.message)
       })
   }
 )
