@@ -1,5 +1,6 @@
 {
   "name": "abbondanzo-functions",
+  "private": true,
   "scripts": {
     "lint": "tslint --project tsconfig.json",
     "build": "tsc",
@@ -27,5 +28,7 @@
     "tslint": "^6.1.0",
     "typescript": "^3.8.3"
   },
-  "private": true
+  "engines": {
+    "node": "8"
+  }
 }
