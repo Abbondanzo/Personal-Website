@@ -123,9 +123,9 @@ const sendEmail = (
         }
         // Send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
-          if (error || !info.messageId) {
+          if (error || !info || !info.messageId) {
             console.error(error)
-            reject(`${error || info.messageId}`)
+            reject(`${error || info || info.messageId}`)
           }
           resolve(`Message sent: ${info.messageId}`)
         })
