@@ -112,17 +112,22 @@ const sendEmail = async (
   console.log('Sending email...')
 
   // Send mail
-  const transporter = buildTransporter()
   return new Promise((resolve, reject) => {
-    transporter.sendMail(mailOptions, (error, info) => {
-      const messageId = info && info.messageId
-      if (error || !messageId) {
-        console.error(error)
-        reject(new Error('Unable to send mail'))
-      } else {
-        resolve(`Message sent: ${info.messageId}`)
-      }
-    })
+    try {
+      const transporter = buildTransporter()
+      transporter.sendMail(mailOptions, (error, info) => {
+        const messageId = info && info.messageId
+        if (error || !messageId) {
+          console.error(error)
+          reject(new Error('Unable to send mail'))
+        } else {
+          resolve(`Message sent: ${info.messageId}`)
+        }
+      })
+    } catch (err) {
+      console.error(err)
+      reject(new Error('Unable to send mail'))
+    }
   })
 }
 
